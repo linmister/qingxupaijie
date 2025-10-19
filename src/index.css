@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 强制禁用所有textarea的resize功能 */
+textarea {
+  resize: none !important;
+  overflow: hidden !important;
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+/* 隐藏webkit浏览器的滚动条 */
+textarea::-webkit-scrollbar {
+  display: none !important;
+}
