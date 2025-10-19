@@ -132,9 +132,9 @@ function App() {
   const currentMode = emotionModes[selectedTab] || emotionModes.chat;
   
   const tabs: Array<{ id: EmotionMode; label: string; gradient: string }> = [
-    { id: 'chat', label: '受气包', gradient: 'from-yellow-300 to-yellow-400' },
+    { id: 'chat', label: '受气包', gradient: 'from-red-300 to-red-400' },
     { id: 'mutual', label: '抬杠', gradient: 'from-red-300 to-red-400' },
-    { id: 'mood', label: '疗愈', gradient: 'from-green-300 to-green-400' }
+    { id: 'mood', label: '疗愈', gradient: 'from-red-300 to-red-400' }
   ];
 
   return (
