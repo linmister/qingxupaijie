@@ -1,28 +1,28 @@
-# Simple workflow for deploying static content to GitHub Pages
+# 构建并部署React应用到GitHub Pages
 name: Deploy static content to Pages
 
 on:
-  # Runs on pushes targeting the default branch
+  # 当推送到master分支时触发
   push:
     branches: ["master"]
 
-  # Allows you to run this workflow manually from the Actions tab
+  # 允许从Actions标签页手动运行此工作流
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+# 设置GITHUB_TOKEN的权限以允许部署到GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+# 只允许一个并发部署，跳过正在进行的运行和最新排队的运行之间排队的运行
+# 但是，不要取消正在进行的运行，因为我们希望允许这些生产部署完成
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
+  # 构建和部署作业
   deploy:
     environment:
       name: github-pages
@@ -31,13 +31,32 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build
+        run: npm run build
+        env:
+          VITE_ARK_API_KEY: ${{ secrets.VITE_ARK_API_KEY }}
+          VITE_TTS_ACCESS_KEY: ${{ secrets.VITE_TTS_ACCESS_KEY }}
+          VITE_TTS_APP_ID: ${{ secrets.VITE_TTS_APP_ID }}
+        
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: '.'
+          # 上传构建产物目录
+          path: './dist'
+          
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
