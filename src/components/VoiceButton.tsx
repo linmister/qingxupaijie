@@ -182,10 +182,10 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
           <AudioPlayer
             audioData={audioData}
             format="mp3"
-            autoPlay
+            autoPlay={true}
             onEnded={handlePlayEnded}
             onError={handlePlayError}
-            className="shadow-sm"
+            className="bg-white border border-gray-200"
             showProgress
             showTime
           />

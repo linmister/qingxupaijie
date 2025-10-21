@@ -134,9 +134,23 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
           audioRef.current.currentTime = 0;
         }
         
-        await audioRef.current.play();
-        setIsPlaying(true);
-        onPlay?.();
+        // 添加用户手势检查，确保在移动端能正常播放
+        try {
+          await audioRef.current.play();
+          setIsPlaying(true);
+          onPlay?.();
+        } catch (playError) {
+          // 如果播放失败，可能是因为缺少用户手势
+          if (playError instanceof Error && playError.name === 'NotAllowedError') {
+            setError('请点击播放按钮开始播放音频');
+            onError?.('需要用户手势才能播放音频');
+          } else {
+            setError('音频播放失败');
+            onError?.(playError instanceof Error ? playError.message : '播放失败');
+          }
+          setIsPlaying(false);
+        }
+        
       } catch (err) {
         // 忽略AbortError，这通常是由于快速切换导致的正常中断
         if (err instanceof Error && err.name === 'AbortError') {
@@ -148,6 +162,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
         setError(errorMsg);
         onError?.(errorMsg);
         console.error('音频播放失败:', err);
+        setIsPlaying(false);
       } finally {
         setIsLoading(false);
       }
@@ -258,10 +273,19 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
     };
   }, [audioData, format]); // 移除onError依赖，避免不必要的重新加载
 
-  // 自动播放
+  // 智能自动播放：桌面端自动播放，移动端手动播放
   useEffect(() => {
     if (autoPlay && audioData && audioRef.current) {
-      handlePlay();
+      // 检测设备类型
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isMobile) {
+        // 移动端：不自动播放，避免用户手势限制
+        console.log('移动端检测：音频已准备就绪，请点击播放按钮');
+      } else {
+        // 桌面端：正常自动播放，提供流畅体验
+        handlePlay();
+      }
     }
   }, [audioData, autoPlay]);
 
